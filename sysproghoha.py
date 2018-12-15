@@ -11,20 +11,25 @@ GPIO.cleanup()
 #sensor infra red
 GPIO.setup(17, GPIO.IN)
 
-app=Flask(__name__)
-	
 pins = {
 		20 : {'name' : 'GPIO 20', 'state' : 0},
 		21 : {'name' : 'GPIO 21', 'state' : 0}
 		#######_________________CAN ADD MORE GPIO HERE___________________#########
 		}
 
+for pin in pins:
+	GPIO.setup(pin, GPIO.OUT)
+	GPIO.output(pin, 0)	
+
+app=Flask(__name__)
+
 def cleanup():
 	for pin in pins:
 		GPIO.output(pin, 0)
 
 @app.after_request
-def mainProgram():
+def mainProgram(response):
+	timeout = 10
 	buka = False
 	# status = "Belum Dibuka"
 	countdown = 5
@@ -40,6 +45,7 @@ def mainProgram():
 			buka = True
 			countdown = 5
 			sleep(1)
+			timeout = 10
 			cleanup()
 			
 		elif sensor == 1 and buka and countdown == 0:
@@ -50,17 +56,25 @@ def mainProgram():
 			buka = False
 			countdown = 5
 			sleep(1)
+			timeout = 10
 			cleanup()
 		
 		elif sensor == 1 and buka:
 			print("Tidak ada orang")
 			countdown-=1
 			sleep(1)
+			timeout = 10
 		
 		elif sensor == 0 and buka:
 			print("Ada orang")
 			countdown=5
 			sleep(1)
+			timeout = 10
+
+		elif sensor == 1 and not buka:
+			timeout -= 1
+			if timeout == 0:
+				return response
 
 @app.route('/')
 def index():
@@ -76,7 +90,6 @@ def action(action):
 		GPIO.output(21, 0)
 		sleep(1)
 		cleanup()
-
 
 	elif action == "close":
 		GPIO.output(20, 0)
@@ -97,7 +110,3 @@ if(__name__=='__main__'):
 	# 		sleep(0.5)
 	# except KeyboardInterrupt as e:
 	# 	GPIO.cleanup()
-
-for pin in pins:
-	GPIO.setup(pin, GPIO.OUT)
-	GPIO.output(pin, 0)		
