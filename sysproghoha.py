@@ -73,6 +73,7 @@ def mainProgram(response):
 
 		elif sensor == 1 and not buka:
 			timeout -= 1
+			sleep(1)
 			if timeout == 0:
 				return response
 
