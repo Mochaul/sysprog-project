@@ -1,7 +1,9 @@
+from flask import Flask,render_template
 import RPi.GPIO as GPIO
 from time import sleep
 
 GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(0)
 
 GPIO.cleanup()
 
@@ -9,23 +11,43 @@ GPIO.cleanup()
 GPIO.setup(17, GPIO.IN)
 
 #buat motor
+
+app=Flask(__name__)
+	
 pins = {
 		20 : {'name' : 'GPIO 20', 'state' : 0},
 		21 : {'name' : 'GPIO 21', 'state' : 0}
 		#######_________________CAN ADD MORE GPIO HERE___________________#########
 		}
 #setup
-for pin in pins:
-	GPIO.setup(pin, GPIO.OUT)
-	GPIO.output(pin, 0)
 
 def cleanup():
 	for pin in pins:
 		GPIO.output(pin, 0)
 	
+@app.route('/')
+def index():
+		templateData = {
+			# 'data' : status
+		}
+		return render_template('index.html', **templateData)	
 
-buka = False
+
+if(__name__=='__main__'):
+	app.run(debug=True,host='0.0.0.0')
+
+	try:
+		while True:
+			sleep(0.5)
+	except KeyboardInterrupt as e:
+		GPIO.cleanup()
+
+for pin in pins:
+	GPIO.setup(pin, GPIO.OUT)
+	GPIO.output(pin, 0)
 	
+buka = False
+status = "belum dibuka"
 countdown = 5
 while True:
 	sensor = GPIO.input(17)
@@ -60,3 +82,5 @@ while True:
 		print("ada orang")
 		countdown=5
 		sleep(1)
+
+		
