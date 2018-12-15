@@ -4,6 +4,7 @@ body, html {
   }
   
   .bgimg {
+    background-color: #3157D7;
     /* Full-screen */
     height: 100%;
     /* Center the background image */
@@ -45,6 +46,9 @@ body, html {
   
   /* Style the <hr> element */
   hr {
-    margin: auto;
-    width: 40%;
+    color: white
+  }
+
+  a {
+    color: white
   }
